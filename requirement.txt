@@ -3,3 +3,4 @@ dotenv
 uvicorn
 pydantic
 typing
+ollama
