@@ -9,12 +9,12 @@ class QueryInput(BaseModel):
     selections: Optional[List[str]] = None
     
 class ReportOptionsResponse(BaseModel):
-    prompt: str
+    response: str
     options: List[str]
 
-# class SubReportOptionsResponse(BaseModel):
-#     prompt: str
-#     options: List[str]
+class SubReportOptionsResponse(BaseModel):
+     response: str
+     options: List[str]
 
 # class FilterRequestResponse(BaseModel):
 #     prompt: str
@@ -24,7 +24,8 @@ class ChatResponse(BaseModel):
     response: str
 
 class SessionData(BaseModel):
-    stage: str
-    selected_reports: List[str] = Field(default_factory=list)
-    # selected_subreports: List[str] = Field(default_factory=list)
-    # filters: Dict[str, str] = Field(default_factory=dict)
+    session_id: str
+    stage: str="start"
+    report_type: Optional[str] = None
+    subreport_type: Optional[str] = None
+    selected_columns:list[str] = []

@@ -4,6 +4,8 @@ from memory import get_session, update_session
 from logic import classify_intent, get_available_reports, get_subreports_for
 from report_engine import generate_report
 from fastapi.middleware.cors import CORSMiddleware
+from logic import call_llm_api
+from h_r_flow import handle_report_flow
 
 app = FastAPI()
 
@@ -19,38 +21,29 @@ app.add_middleware(
 def ask(user_input: QueryInput):
     session = get_session(user_input.session_id)
     print(user_input)
-    if user_input.button=="Report":
-        return ReportOptionsResponse(
-                prompt="Which reports do you want? Select from below:",
-                options=get_available_reports()
-            )
-    intent=""
-    if user_input.selections :
-        intent="report"
-    else:
-        intent = classify_intent(user_input.text, user_input.button)
-       
-    print(intent) 
-        
-    if intent == "report":
-        if session.stage == "start":
+
+    # --- Always classify intent on new user input ---
+    intent = classify_intent(user_input.text, user_input.button,user_input.selections)
+    print(intent)
+
+    # --- If user switches to chat mode ---
+    if intent == "chat":
+        session.stage = "chat"
+        update_session(user_input.session_id, session)
+        message=call_llm_api([{ "role": "user", "content": user_input.text }])
+        print(message)
+        return ChatResponse(response=message)
+    elif intent == "report":
+        if session.stage in ["start", "chat"] or user_input.button == "Report":
             session.stage = "report_selected"
+            session.report_type = None
+            session.subreport_type = None
+            session.selected_columns = []
             update_session(user_input.session_id, session)
             return ReportOptionsResponse(
-                prompt="Which reports do you want? Select from below:",
+                response="What type of report do you want?",
                 options=get_available_reports()
             )
-    
-        # elif session.stage == "report_selected":
-        #     # Receive report selections
-        #     session.selected_reports = user_input.selections or []
-        #     session.stage = "subreport_selected"
-        #     update_session(user_input.session_id, session)
-        #     # return SubReportOptionsResponse(
-        #     #     prompt="What type of subreport do you want for the selected reports?",
-        #     #     options=get_subreports_for(session.selected_reports)
-        #     #)
-        
+        return handle_report_flow(user_input, session)
 
-
-    return ChatResponse(response="steps are not working properly.")
+    return ChatResponse(response="Could not detect intent. Please try again.")
