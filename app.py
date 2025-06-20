@@ -6,6 +6,7 @@ from report_engine import generate_report
 from fastapi.middleware.cors import CORSMiddleware
 from logic import call_llm_api
 from h_r_flow import handle_report_flow
+from nav_logic import nav_button
 
 app = FastAPI()
 
@@ -21,12 +22,12 @@ app.add_middleware(
 def ask(user_input: QueryInput):
     session = get_session(user_input.session_id)
     print(user_input)
+    
+    if user_input.button in ["reset_report", "reset_sub_report", "reset_sub_sub_report"]:
+        return nav_button(user_input,session)
 
-    # --- Always classify intent on new user input ---
     intent = classify_intent(user_input.text, user_input.button,user_input.selections)
     print(intent)
-
-    # --- If user switches to chat mode ---
     if intent == "chat":
         session.stage = "chat"
         update_session(user_input.session_id, session)
@@ -38,12 +39,15 @@ def ask(user_input: QueryInput):
             session.stage = "report_selected"
             session.report_type = None
             session.subreport_type = None
+            session.subsubreport_type=None
             session.selected_columns = []
             update_session(user_input.session_id, session)
             return ReportOptionsResponse(
                 response="What type of report do you want?",
-                options=get_available_reports()
+                options=get_available_reports(),
+                stage="report"
             )
         return handle_report_flow(user_input, session)
 
     return ChatResponse(response="Could not detect intent. Please try again.")
+
