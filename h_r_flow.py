@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from models import QueryInput, ReportOptionsResponse, ChatResponse            #, FilterRequestResponse
+from models import QueryInput, ReportOptionsResponse, ChatResponse, FilterRequestResponse
 from memory import get_session, update_session
-from logic import classify_intent, get_available_reports, get_subreports_for,has_subsubreports,get_subsubreports,get_columns_for
+from logic import classify_intent, get_available_reports, get_subreports_for,has_subsubreports,get_subsubreports,get_columns_for,get_filter
 from logic import call_llm_api
 
 def handle_report_flow(user_input: QueryInput, session):
@@ -26,7 +26,7 @@ def handle_report_flow(user_input: QueryInput, session):
                 stage="subsubreports"
             )
         else:
-            session.stage = "awaiting_columns"
+            session.stage = "columns_selected"
             update_session(user_input.session_id, session)
             return ReportOptionsResponse(
                 response=f"Which columns do you want in the '{session.subreport_type}' report?",
@@ -35,7 +35,7 @@ def handle_report_flow(user_input: QueryInput, session):
             )
     elif session.stage == "subsubreport_selected" and user_input.selections:
         session.subsubreport_type = user_input.selections[0] if isinstance(user_input.selections, list) else user_input.selections
-        session.stage = "awaiting_columns"
+        session.stage = "columns_selected"
         update_session(user_input.session_id, session)
         return ReportOptionsResponse(
             response=f"Which columns do you want in the '{session.subsubreport_type}' section?",
@@ -43,10 +43,17 @@ def handle_report_flow(user_input: QueryInput, session):
             stage="columns"
         )
 
-    elif session.stage == "awaiting_columns" and user_input.selections:
-        session.selected_columns = user_input.selections
-        session.stage = "ready_to_generate"
+    elif session.stage == "columns_selected" and user_input.columns:
+        session.selected_columns = user_input.columns
+        print("before:",user_input.columns)
+        print("save:",session.selected_columns)
+        session.stage = "Filters"
         update_session(user_input.session_id, session)
-        return ChatResponse(response="Thanks! Generating your report now...")#, columns=session.selected_columns)
+        return FilterRequestResponse(response="ok then select all the filters.",
+               options=get_filter(session.report_type, session.subreport_type, session.subsubreport_type),
+               stage='Filters'                      
+        
+        )
+    
 
     return ChatResponse(response="Still waiting for your input to proceed in report flow.")
