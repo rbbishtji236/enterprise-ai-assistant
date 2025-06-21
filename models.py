@@ -8,6 +8,7 @@ class QueryInput(BaseModel):
     button: Optional[str] = None
     selections: Optional[List[str]] = None
     columns: Optional[List[str]] = None
+    Filters: Optional[List[str]] = None
     
 class ReportOptionsResponse(BaseModel):
     response: str
@@ -21,9 +22,10 @@ class SubReportOptionsResponse(BaseModel):
      stage: Optional[str] = None
 
 
-# class FilterRequestResponse(BaseModel):
-#     prompt: str
-#     filters: List[str]
+class FilterRequestResponse(BaseModel):
+    response: str
+    options: List[str]
+    stage:Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -35,3 +37,4 @@ class SessionData(BaseModel):
     subreport_type: Optional[str] = None
     subsubreport_type:Optional[str] = None
     selected_columns:list[str] = []
+    selected_Filters:list[str]=[]

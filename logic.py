@@ -27,14 +27,21 @@ def get_columns_for(topic: str, subreport: str, subsubreport: Optional[str] = No
 def has_subsubreports(topic: str, subreport: str) -> bool:
     value = REPORTS_METADATA.get(topic, {}).get(subreport)
     return isinstance(value, dict) and any(isinstance(v, dict) for v in value.values())
-
 def get_subsubreports(topic: str, subreport: str) -> List[str]:
     return list(REPORTS_METADATA.get(topic, {}).get(subreport, {}).keys())
 
+def get_filter(topic:str,subreport: str, subsubreport:Optional[str]=None)-> List[str]:
+    print(topic,subreport,subsubreport)
+    if subsubreport:
+        return list(REPORTS_METADATA.get(topic, {}).get(subreport, {}).get(subsubreport, {}).get("Filters", []))
+    else:
+        return list(REPORTS_METADATA.get(topic,{}).get(subreport,{}).get("Filters",[]))
 
 
-def classify_intent(text=None, button=None,selections=None):
-    if selections:
+
+
+def classify_intent(text=None, button=None,selections=None,columns=None):
+    if selections or columns:
         return "report"
     if button:
         if button.lower() in ['report', 'viewall']:
