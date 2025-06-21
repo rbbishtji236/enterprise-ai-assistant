@@ -41,6 +41,7 @@ def ask(user_input: QueryInput):
             session.subreport_type = None
             session.subsubreport_type=None
             session.selected_columns = []
+            session.selected_Filters = []
             update_session(user_input.session_id, session)
             return ReportOptionsResponse(
                 response="What type of report do you want?",
