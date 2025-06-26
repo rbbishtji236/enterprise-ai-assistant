@@ -10,7 +10,6 @@ def nav_button(user_input,session):
         session.subreport_type = None
         session.subsubreport_type = None
         session.selected_columns = []
-        session.selected_Filters = []
         update_session(user_input.session_id, session)
         return ReportOptionsResponse(
             response="What type of report do you want?",
@@ -22,7 +21,6 @@ def nav_button(user_input,session):
         session.subreport_type = None
         session.subsubreport_type = None
         session.selected_columns = []
-        session.selected_Filters = []
         update_session(user_input.session_id, session)
         return ReportOptionsResponse(
             response=f"What type of subreport do you want for '{session.report_type}'?",
@@ -33,7 +31,6 @@ def nav_button(user_input,session):
         session.stage = "subsubreport_selected"
         session.subsubreport_type = None
         session.selected_columns = []
-        session.selected_Filters = []
         update_session(user_input.session_id, session)
         return ReportOptionsResponse(
             response=f"Which section of '{session.subreport_type}' do you want to see?",

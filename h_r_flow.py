@@ -45,8 +45,6 @@ def handle_report_flow(user_input: QueryInput, session):
 
     elif session.stage == "columns_selected" and user_input.columns:
         session.selected_columns = user_input.columns
-        print("before:",user_input.columns)
-        print("save:",session.selected_columns)
         session.stage = "Filters"
         update_session(user_input.session_id, session)
         return FilterRequestResponse(response="ok then select all the filters.",

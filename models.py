@@ -1,6 +1,9 @@
 from pydantic import BaseModel,Field
 from typing import List,Optional,Dict
 
+class ApiInput(BaseModel):
+    pottoken: str
+    jsession: str
 class QueryInput(BaseModel):
     session_id: str
     #user_query: str
@@ -38,3 +41,9 @@ class SessionData(BaseModel):
     subsubreport_type:Optional[str] = None
     selected_columns:list[str] = []
     selected_Filters:list[str]=[]
+    
+class LoginPayload(BaseModel):
+    username: str
+    password: str
+    clientcode: str
+    potSeed: str
