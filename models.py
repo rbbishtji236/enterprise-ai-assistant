@@ -1,5 +1,6 @@
 from pydantic import BaseModel,Field
-from typing import List,Optional,Dict
+from typing import List,Optional,Dict,Union
+from datetime import date
 
 class ApiInput(BaseModel):
     pottoken: str
@@ -47,3 +48,14 @@ class LoginPayload(BaseModel):
     password: str
     clientcode: str
     potSeed: str
+    
+class get_report(BaseModel):
+    pottoken: str
+    jsession: str
+    session_id: str
+    fromDate: str
+    toDate: str
+    loginUser: Union[str, bool]
+    projIds: List[int]
+    status: Optional[int] = None
+

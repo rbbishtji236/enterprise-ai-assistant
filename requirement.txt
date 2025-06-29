@@ -4,3 +4,4 @@ uvicorn
 pydantic
 typing
 ollama
+requests

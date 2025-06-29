@@ -9,6 +9,8 @@ from h_r_flow import handle_report_flow
 from nav_logic import nav_button
 from filters_api import router as filters_router
 from connection import router as connection_router
+from get_r import router as show_report
+from get_rep_mod import router as modify_report
 
 app = FastAPI()
 
@@ -56,3 +58,5 @@ def ask(user_input: QueryInput):
 
 app.include_router(filters_router,tags=["Filter"])
 app.include_router(connection_router, prefix="/auth", tags=["Connection"])
+app.include_router(show_report,tags=["Report"])
+app.include_router(modify_report,tags=["Report"])
